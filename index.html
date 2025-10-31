@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Scrolling Top — MULTI APPS Social</title>
+<link rel="icon" href="data:," />
+<style>
+  :root{
+    --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#5b6cff;
+    --pill:#16202b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, #071026 0%, #0b1220 100%);
+    color:#e6eef8; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    min-height:100vh;
+  }
+
+  /* Top bar with scrolling name */
+  header{
+    position:sticky; top:0; z-index:60; backdrop-filter: blur(6px);
+    display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03);
+    background: linear-gradient(180deg, rgba(7,16,36,0.6), rgba(11,18,32,0.4));
+  }
+  .logo{
+    width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,#6f4bff,#3bb7ff);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:white; flex-shrink:0;
+  }
+  .marquee {
+    overflow:hidden; white-space:nowrap; width:calc(100% - 150px);
+  }
+  .marqueeInner {
+    display:inline-block; padding-left:100%; animation:scroll 14s linear infinite;
+    font-weight:700; font-size:16px;
+  }
+  @keyframes scroll{ 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
+
+  .topBtns { margin-left:auto; display:flex; gap:8px; align-items:center; }
+
+  .iconBtn { background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px 10px; border-radius:10px; color:var(--muted); cursor:pointer; }
+
+  main{padding:12px 12px 90px 12px}
+
+  /* Layout */
+  .container { max-width:720px; margin:0 auto; }
+  .compose { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px; border-radius:12px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.03); }
+  .compose input[type="file"] { width:100%; }
+  .compose textarea { width:100%; resize:vertical; min-height:60px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit; }
+
+  .grid { display:flex; flex-direction:column; gap:12px; }
+
+  .post { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:10px; border:1px solid rgba(255,255,255,0.03); }
+  .postTop { display:flex; align-items:center; gap:10px; }
+  .avatar { width:44px; height:44px; border-radius:50%; background:#1f2a36; display:inline-block; flex-shrink:0; }
+  .meta { flex:1 }
+  .username { font-weight:700 }
+  .time { color:var(--muted); font-size:12px }
+  .imageWrap { margin-top:10px; border-radius:10px; overflow:hidden; background:#0b1220 }
+  .imageWrap img { width:100%; display:block; height:auto; max-height:480px; object-fit:cover; }
+
+  .actions { display:flex; align-items:center; gap:10px; margin-top:8px }
+  .likeBtn, .commentBtn { background:transparent; border:1px solid rgba(255,255,255,0.03); padding:8px 10px; border-radius:8px; color:var(--muted); cursor:pointer }
+  .likeBtn.active { color:#ff6b6b; border-color: rgba(255,107,107,0.2); }
+
+  .caption { margin-top:8px; color:#dbe9ff }
+  .comments { margin-top:8px; color:var(--muted); font-size:14px }
+  .addComment { display:flex; gap:8px; margin-top:8px }
+  .addComment input { flex:1; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit }
+  .btn { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; background:linear-gradient(90deg,#6f4bff,#3bb7ff); color:white; font-weight:700 }
+
+  /* bottom nav */
+  nav.bottomNav {
+    position:fixed; left:0; right:0; bottom:10px; z-index:80; display:flex; justify-content:center; pointer-events:auto;
+  }
+  .navInner { width:100%; max-width:720px; display:flex; justify-content:space-around; gap:8px; padding:10px; background:linear-gradient(180deg, rgba(7,12,22,0.9), rgba(7,12,22,0.6)); border-radius:999px; margin:0 12px; border:1px solid rgba(255,255,255,0.03) }
+  .navBtn { flex:1; text-align:center; color:var(--muted); font-weight:700; padding:8px 6px; border-radius:8px; cursor:pointer; }
+
+  /* profile */
+  .profileHeader { display:flex; gap:12px; align-items:center; margin-bottom:12px }
+  .profileAvatar { width:88px;height:88px;border-radius:16px;background:#1f2a36 }
+  .profileStats { display:flex; gap:12px }
+
+  /* small */
+  @media (max-width:420px){
+    .marqueeInner{font-size:14px}
+    .navInner{padding:8px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MA</div>
+  <div class="marquee"><div class="marqueeInner" id="scrollTitle">Scrolling Top — MULTI APPS Social • Scrolling Top — MULTI APPS Social • </div></div>
+  <div class="topBtns">
+    <button class="iconBtn" id="goProfile">Profile</button>
+    <button class="iconBtn" id="clearAll">Clear</button>
+  </div>
+</header>
+
+<main class="container">
+  <!-- Compose / new post -->
+  <div class="compose" id="compose">
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="avatar"></div>
+      <div style="flex:1">
+        <div style="display:flex;gap:8px">
+          <input id="fileInput" type="file" accept="image/*" style="flex:1" />
+          <button id="postBtn" class="btn">Post</button>
+        </div>
+        <textarea id="caption" placeholder="Write a caption..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feed -->
+  <div class="grid" id="feed"></div>
+
+  <!-- Profile view (hidden by default) -->
+  <div id="profileView" style="display:none">
+    <div class="profileHeader">
+      <div class="profileAvatar"></div>
+      <div>
+        <div style="font-weight:800;font-size:18px">You (Local)</div>
+        <div class="profileStats" id="profileStats"></div>
+      </div>
+    </div>
+    <div id="profilePosts" class="grid"></div>
+  </div>
+
+</main>
+
+<nav class="bottomNav">
+  <div class="navInner">
+    <div class="navBtn" id="navHome">Home</div>
+    <div class="navBtn" id="navNew">New</div>
+    <div class="navBtn" id="navProfile">Profile</div>
+  </div>
+</nav>
+
+<script>
+/*
+  Simple client-side Instagram-like demo
+  - Posts stored in localStorage as array "st_posts"
+  - Each post: {id, image (dataURL), caption, createdAt, likes:[], comments: [{text, at}]}
+*/
+
+const LS_KEY = 'st_posts_v1';
+const USER_ID = 'local_user';
+const feedEl = document.getElementById('feed');
+const profileView = document.getElementById('profileView');
+const profilePosts = document.getElementById('profilePosts');
+const profileStats = document.getElementById('profileStats');
+
+function uid() { return 'id_' + Math.random().toString(36).slice(2,9); }
+function readPosts(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; } }
+function writePosts(p){ localStorage.setItem(LS_KEY, JSON.stringify(p)); }
+
+// Initial demo posts if empty
+if(!localStorage.getItem(LS_KEY)){
+  const demo = [
+    { id:uid(), image:'https://images.unsplash.com/photo-1601597117403-7b9c6b3b9d6f?auto=format&fit=crop&w=800&q=60', caption:'Sunset ride 🌇', createdAt:Date.now()-3600*1000*24, likes:[], comments:[]},
+    { id:uid(), image:'https://images.unsplash.com/photo-1517949908111-1b5bffb1d3e7?auto=format&fit=crop&w=800&q=60', caption:'Highway vibes 🚗', createdAt:Date.now()-3600*1000*12, likes:[], comments:[]}
+  ];
+  writePosts(demo);
+}
+
+/* Render feed */
+function renderFeed(){
+  const posts = readPosts().slice().sort((a,b)=>b.createdAt - a.createdAt);
+  feedEl.innerHTML = '';
+  posts.forEach(p=>{
+    const div = document.createElement('div'); div.className='post';
+    div.innerHTML = `
+      <div class="postTop">
+        <div class="avatar"></div>
+        <div class="meta">
+          <div class="username">You</div>
+          <div class="time">${timeAgo(p.createdAt)}</div>
+        </div>
+      </div>
+      <div class="imageWrap"><img src="${escapeHTML(p.image)}" alt="post image" /></div>
+      <div class="actions">
+        <button class="likeBtn ${p.likes.includes(USER_ID)?'active':''}" data-id="${p.id}">${p.likes.includes(USER_ID)?'♥':'♡'} ${p.likes.length}</button>
+        <button class="commentBtn" data-id="${p.id}">💬 ${p.comments.length}</button>
+      </div>
+      <div class="caption">${escapeHTML(p.caption||'')}</div>
+      <div class="comments" id="c_${p.id}">${renderComments(p.comments)}</div>
+      <div class="addComment">
+        <input placeholder="Add a comment..." id="in_${p.id}" />
+        <button class="btn cbtn" data-id="${p.id}">Post</button>
+      </div>
+    `;
+    feedEl.appendChild(div);
+  });
+
+  // add listeners
+  document.querySelectorAll('.likeBtn').forEach(b=>{
+    b.onclick = ()=>{ toggleLike(b.getAttribute('data-id')); };
+  });
+  document.querySelectorAll('.commentBtn').forEach(b=>{
+    b.onclick = ()=>{ document.getElementById('in_'+b.getAttribute('data-id')).focus(); };
+  });
+  document.querySelectorAll('.cbtn').forEach(b=>{
+    b.onclick = ()=>{ addComment(b.getAttribute('data-id')); };
+  });
+}
+
+/* Comments render helper */
+function renderComments(comments){
+  if(!comments || comments.length===0) return '';
+  return comments.slice(-3).map(c=>`<div style="margin-top:6px"><strong>${escapeHTML(c.user||'You')}</strong> ${escapeHTML(c.text)}</div>`).join('');
+}
+
+/* Like toggle */
+function toggleLike(id){
+  const posts = readPosts();
+  const p = posts.find(x=>x.id===id); if(!p) return;
+  if(p.likes.includes(USER_ID)) p.likes = p.likes.filter(x=>x!==USER_ID); else p.likes.push(USER_ID);
+  writePosts(posts); renderFeed(); updateProfileStats();
+}
+
+/* Add comment */
+function addComment(id){
+  const inp = document.getElementById('in_'+id);
+  if(!inp) return;
+  const txt = inp.value.trim(); if(!txt) return;
+  const posts = readPosts(); const p = posts.find(x=>x.id===id);
+  p.comments = p.comments || []; p.comments.push({user:'You', text:txt, at:Date.now()});
+  writePosts(posts);
+  inp.value=''; renderFeed(); updateProfileStats();
+}
+
+/* Create post (file input) */
+const fileInput = document.getElementById('fileInput');
+const captionInput = document.getElementById('caption');
+document.getElementById('postBtn').addEventListener('click', ()=> {
+  const file = fileInput.files[0];
+  const caption = captionInput.value.trim();
+  if(!file){ alert('Please select an image'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const posts = readPosts();
+    posts.push({ id:uid(), image:e.target.result, caption:caption, createdAt:Date.now(), likes:[], comments:[] });
+    writePosts(posts);
+    fileInput.value=''; captionInput.value=''; renderFeed(); updateProfileStats(); alert('Posted!');
+  };
+  reader.readAsDataURL(file);
+});
+
+/* Profile view */
+function showProfile(){
+  document.getElementById('compose').style.display='none';
+  document.getElementById('feed').style.display='none';
+  profileView.style.display='block';
+  const posts = readPosts().filter(p=>true).slice().sort((a,b)=>b.createdAt-a.createdAt); // all local posts
+  profilePosts.innerHTML='';
+  posts.forEach(p=>{
+    const d = document.createElement('div'); d.className='post';
+    d.innerHTML = `<div class="imageWrap"><img src="${escapeHTML(p.image)}" /></div><div class="caption">${escapeHTML(p.caption||'')}</div>`;
+    profilePosts.appendChild(d);
+  });
+  updateProfileStats();
+}
+function showHome(){
+  document.getElementById('compose').style.display='';
+  document.getElementById('feed').style.display='';
+  profileView.style.display='none';
+  renderFeed();
+}
+
+/* Stats */
+function updateProfileStats(){
+  const posts = readPosts();
+  const myPosts = posts.filter(p=>true);
+  const likes = myPosts.reduce((s,p)=>s + (p.likes? p.likes.length:0), 0);
+  profileStats.innerHTML = `<div>Posts: <strong>${myPosts.length}</strong></div><div>Likes: <strong>${likes}</strong></div>`;
+}
+
+/* Utilities */
+function timeAgo(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s < 60) return s+'s';
+  if(s < 3600) return Math.floor(s/60)+'m';
+  if(s < 86400) return Math.floor(s/3600)+'h';
+  return Math.floor(s/86400)+'d';
+}
+function escapeHTML(s){ if(!s) return ''; return (''+s).replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* Nav */
+document.getElementById('navHome').addEventListener('click', showHome);
+document.getElementById('navNew').addEventListener('click', ()=>{ window.scrollTo({top:0,behavior:'smooth'}); });
+document.getElementById('navProfile').addEventListener('click', showProfile);
+document.getElementById('goProfile').addEventListener('click', showProfile);
+document.getElementById('clearAll').addEventListener('click', ()=>{ if(confirm('Clear all local posts?')){ localStorage.removeItem(LS_KEY); location.reload(); } });
+
+/* initial render */
+renderFeed();
+updateProfileStats();
+
+/* scrolling title update (optional) */
+function setTitle(t){ document.getElementById('scrollTitle').innerText = t + ' • ' + t + ' • '; }
+setTitle('Scrolling Top — MULTI APPS Social');
+
+</script>
+</body>
+</html>
