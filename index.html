@@ -1,309 +1,713 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Scrolling Top — MULTI APPS Social</title>
-<link rel="icon" href="data:," />
-<style>
-  :root{
-    --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#5b6cff;
-    --pill:#16202b;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: linear-gradient(180deg, #071026 0%, #0b1220 100%);
-    color:#e6eef8; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    min-height:100vh;
-  }
-
-  /* Top bar with scrolling name */
-  header{
-    position:sticky; top:0; z-index:60; backdrop-filter: blur(6px);
-    display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03);
-    background: linear-gradient(180deg, rgba(7,16,36,0.6), rgba(11,18,32,0.4));
-  }
-  .logo{
-    width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,#6f4bff,#3bb7ff);
-    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:white; flex-shrink:0;
-  }
-  .marquee {
-    overflow:hidden; white-space:nowrap; width:calc(100% - 150px);
-  }
-  .marqueeInner {
-    display:inline-block; padding-left:100%; animation:scroll 14s linear infinite;
-    font-weight:700; font-size:16px;
-  }
-  @keyframes scroll{ 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
-
-  .topBtns { margin-left:auto; display:flex; gap:8px; align-items:center; }
-
-  .iconBtn { background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px 10px; border-radius:10px; color:var(--muted); cursor:pointer; }
-
-  main{padding:12px 12px 90px 12px}
-
-  /* Layout */
-  .container { max-width:720px; margin:0 auto; }
-  .compose { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px; border-radius:12px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.03); }
-  .compose input[type="file"] { width:100%; }
-  .compose textarea { width:100%; resize:vertical; min-height:60px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit; }
-
-  .grid { display:flex; flex-direction:column; gap:12px; }
-
-  .post { background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:10px; border:1px solid rgba(255,255,255,0.03); }
-  .postTop { display:flex; align-items:center; gap:10px; }
-  .avatar { width:44px; height:44px; border-radius:50%; background:#1f2a36; display:inline-block; flex-shrink:0; }
-  .meta { flex:1 }
-  .username { font-weight:700 }
-  .time { color:var(--muted); font-size:12px }
-  .imageWrap { margin-top:10px; border-radius:10px; overflow:hidden; background:#0b1220 }
-  .imageWrap img { width:100%; display:block; height:auto; max-height:480px; object-fit:cover; }
-
-  .actions { display:flex; align-items:center; gap:10px; margin-top:8px }
-  .likeBtn, .commentBtn { background:transparent; border:1px solid rgba(255,255,255,0.03); padding:8px 10px; border-radius:8px; color:var(--muted); cursor:pointer }
-  .likeBtn.active { color:#ff6b6b; border-color: rgba(255,107,107,0.2); }
-
-  .caption { margin-top:8px; color:#dbe9ff }
-  .comments { margin-top:8px; color:var(--muted); font-size:14px }
-  .addComment { display:flex; gap:8px; margin-top:8px }
-  .addComment input { flex:1; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit }
-  .btn { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; background:linear-gradient(90deg,#6f4bff,#3bb7ff); color:white; font-weight:700 }
-
-  /* bottom nav */
-  nav.bottomNav {
-    position:fixed; left:0; right:0; bottom:10px; z-index:80; display:flex; justify-content:center; pointer-events:auto;
-  }
-  .navInner { width:100%; max-width:720px; display:flex; justify-content:space-around; gap:8px; padding:10px; background:linear-gradient(180deg, rgba(7,12,22,0.9), rgba(7,12,22,0.6)); border-radius:999px; margin:0 12px; border:1px solid rgba(255,255,255,0.03) }
-  .navBtn { flex:1; text-align:center; color:var(--muted); font-weight:700; padding:8px 6px; border-radius:8px; cursor:pointer; }
-
-  /* profile */
-  .profileHeader { display:flex; gap:12px; align-items:center; margin-bottom:12px }
-  .profileAvatar { width:88px;height:88px;border-radius:16px;background:#1f2a36 }
-  .profileStats { display:flex; gap:12px }
-
-  /* small */
-  @media (max-width:420px){
-    .marqueeInner{font-size:14px}
-    .navInner{padding:8px}
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TopScrolling - Firebase Single File</title>
+  <style>
+    *{box-sizing:border-box}
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f6f8;margin:0;color:#111}
+    .header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.06);position:sticky;top:0;z-index:10}
+    .logo{color:#e91e63;font-weight:700;font-size:20px}
+    .container{max-width:900px;margin:18px auto;padding:0 12px}
+    .card{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:12px;margin-bottom:16px}
+    .stories{display:flex;gap:12px;padding:12px 0;overflow-x:auto}
+    .story{min-width:64px;text-align:center}
+    .story img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #e91e63}
+    .post img.main{width:100%;height:420px;object-fit:cover;border-radius:6px}
+    .row{display:flex;gap:8px;align-items:center}
+    .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .btn.primary{background:#e91e63;color:#fff}
+    .input{padding:8px;border-radius:8px;border:1px solid #ddd;flex:1}
+    .small{font-size:13px;color:#666}
+    .like{cursor:pointer;font-weight:600}
+    .comment-input{display:flex;gap:8px;margin-top:8px}
+    .comment-input input{flex:1;padding:8px;border-radius:8px;border:1px solid #ddd}
+    .center{text-align:center;color:#777}
+    .footer{padding:20px;text-align:center;color:#999}
+    /* responsive */
+    @media (max-width:600px){ .post img.main{height:320px} .container{padding:0 8px} }
+  </style>
 </head>
 <body>
+  <header class="header">
+    <div class="logo">TopScrolling</div>
+    <div class="small">Firebase demo — replace config with yours</div>
+  </header>
 
-<header>
-  <div class="logo">MA</div>
-  <div class="marquee"><div class="marqueeInner" id="scrollTitle">Scrolling Top — MULTI APPS Social • Scrolling Top — MULTI APPS Social • </div></div>
-  <div class="topBtns">
-    <button class="iconBtn" id="goProfile">Profile</button>
-    <button class="iconBtn" id="clearAll">Clear</button>
-  </div>
-</header>
-
-<main class="container">
-  <!-- Compose / new post -->
-  <div class="compose" id="compose">
-    <div style="display:flex;gap:8px;align-items:center">
-      <div class="avatar"></div>
-      <div style="flex:1">
-        <div style="display:flex;gap:8px">
-          <input id="fileInput" type="file" accept="image/*" style="flex:1" />
-          <button id="postBtn" class="btn">Post</button>
+  <div class="container">
+    <!-- Status / user area -->
+    <div id="userCard" class="card">
+      <div id="authSection">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button id="btnLogin" class="btn">Login</button>
+          <button id="btnSignup" class="btn">Signup</button>
         </div>
-        <textarea id="caption" placeholder="Write a caption..."></textarea>
+        <div id="authForm" style="display:flex;gap:8px;align-items:center;">
+          <input id="email" class="input" placeholder="Email" />
+          <input id="password" class="input" placeholder="Password" type="password" />
+          <button id="authSubmit" class="btn primary">Go</button>
+        </div>
+        <div id="authMsg" class="small" style="margin-top:8px;color:#666"></div>
       </div>
-    </div>
-  </div>
 
-  <!-- Feed -->
-  <div class="grid" id="feed"></div>
-
-  <!-- Profile view (hidden by default) -->
-  <div id="profileView" style="display:none">
-    <div class="profileHeader">
-      <div class="profileAvatar"></div>
-      <div>
-        <div style="font-weight:800;font-size:18px">You (Local)</div>
-        <div class="profileStats" id="profileStats"></div>
-      </div>
-    </div>
-    <div id="profilePosts" class="grid"></div>
-  </div>
-
-</main>
-
-<nav class="bottomNav">
-  <div class="navInner">
-    <div class="navBtn" id="navHome">Home</div>
-    <div class="navBtn" id="navNew">New</div>
-    <div class="navBtn" id="navProfile">Profile</div>
-  </div>
-</nav>
-
-<script>
-/*
-  Simple client-side Instagram-like demo
-  - Posts stored in localStorage as array "st_posts"
-  - Each post: {id, image (dataURL), caption, createdAt, likes:[], comments: [{text, at}]}
-*/
-
-const LS_KEY = 'st_posts_v1';
-const USER_ID = 'local_user';
-const feedEl = document.getElementById('feed');
-const profileView = document.getElementById('profileView');
-const profilePosts = document.getElementById('profilePosts');
-const profileStats = document.getElementById('profileStats');
-
-function uid() { return 'id_' + Math.random().toString(36).slice(2,9); }
-function readPosts(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; } }
-function writePosts(p){ localStorage.setItem(LS_KEY, JSON.stringify(p)); }
-
-// Initial demo posts if empty
-if(!localStorage.getItem(LS_KEY)){
-  const demo = [
-    { id:uid(), image:'https://images.unsplash.com/photo-1601597117403-7b9c6b3b9d6f?auto=format&fit=crop&w=800&q=60', caption:'Sunset ride 🌇', createdAt:Date.now()-3600*1000*24, likes:[], comments:[]},
-    { id:uid(), image:'https://images.unsplash.com/photo-1517949908111-1b5bffb1d3e7?auto=format&fit=crop&w=800&q=60', caption:'Highway vibes 🚗', createdAt:Date.now()-3600*1000*12, likes:[], comments:[]}
-  ];
-  writePosts(demo);
-}
-
-/* Render feed */
-function renderFeed(){
-  const posts = readPosts().slice().sort((a,b)=>b.createdAt - a.createdAt);
-  feedEl.innerHTML = '';
-  posts.forEach(p=>{
-    const div = document.createElement('div'); div.className='post';
-    div.innerHTML = `
-      <div class="postTop">
-        <div class="avatar"></div>
-        <div class="meta">
-          <div class="username">You</div>
-          <div class="time">${timeAgo(p.createdAt)}</div>
+      <div id="userInfo" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div><strong id="userEmail"></strong></div>
+            <div class="small">UID: <span id="userUid"></span></div>
+          </div>
+          <div>
+            <button id="btnSignOut" class="btn">Sign out</button>
+          </div>
         </div>
       </div>
-      <div class="imageWrap"><img src="${escapeHTML(p.image)}" alt="post image" /></div>
-      <div class="actions">
-        <button class="likeBtn ${p.likes.includes(USER_ID)?'active':''}" data-id="${p.id}">${p.likes.includes(USER_ID)?'♥':'♡'} ${p.likes.length}</button>
-        <button class="commentBtn" data-id="${p.id}">💬 ${p.comments.length}</button>
+    </div>
+
+    <!-- Create post -->
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:8px">Create post</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="fileInput" type="file" accept="image/*" />
+        <input id="captionInput" class="input" placeholder="Caption (optional)" />
+        <button id="postBtn" class="btn primary">Post</button>
+        <div id="uploadProgress" class="small" style="min-width:120px"></div>
       </div>
-      <div class="caption">${escapeHTML(p.caption||'')}</div>
-      <div class="comments" id="c_${p.id}">${renderComments(p.comments)}</div>
-      <div class="addComment">
-        <input placeholder="Add a comment..." id="in_${p.id}" />
-        <button class="btn cbtn" data-id="${p.id}">Post</button>
-      </div>
-    `;
-    feedEl.appendChild(div);
-  });
+      <div class="small" style="margin-top:8px">Images stored in Firebase Storage. Posts saved to Firestore.</div>
+    </div>
 
-  // add listeners
-  document.querySelectorAll('.likeBtn').forEach(b=>{
-    b.onclick = ()=>{ toggleLike(b.getAttribute('data-id')); };
-  });
-  document.querySelectorAll('.commentBtn').forEach(b=>{
-    b.onclick = ()=>{ document.getElementById('in_'+b.getAttribute('data-id')).focus(); };
-  });
-  document.querySelectorAll('.cbtn').forEach(b=>{
-    b.onclick = ()=>{ addComment(b.getAttribute('data-id')); };
-  });
-}
+    <!-- Stories -->
+    <div class="card stories" id="stories">
+      <!-- filled by JS -->
+    </div>
 
-/* Comments render helper */
-function renderComments(comments){
-  if(!comments || comments.length===0) return '';
-  return comments.slice(-3).map(c=>`<div style="margin-top:6px"><strong>${escapeHTML(c.user||'You')}</strong> ${escapeHTML(c.text)}</div>`).join('');
-}
+    <!-- Feed -->
+    <div id="feedArea"></div>
 
-/* Like toggle */
-function toggleLike(id){
-  const posts = readPosts();
-  const p = posts.find(x=>x.id===id); if(!p) return;
-  if(p.likes.includes(USER_ID)) p.likes = p.likes.filter(x=>x!==USER_ID); else p.likes.push(USER_ID);
-  writePosts(posts); renderFeed(); updateProfileStats();
-}
+    <div class="footer">Built with Firebase — demo. Secure your rules before production.</div>
+  </div>
 
-/* Add comment */
-function addComment(id){
-  const inp = document.getElementById('in_'+id);
-  if(!inp) return;
-  const txt = inp.value.trim(); if(!txt) return;
-  const posts = readPosts(); const p = posts.find(x=>x.id===id);
-  p.comments = p.comments || []; p.comments.push({user:'You', text:txt, at:Date.now()});
-  writePosts(posts);
-  inp.value=''; renderFeed(); updateProfileStats();
-}
+  <!-- Firebase compat CDN (single-file demo uses compat libs for easy copy-paste) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
-/* Create post (file input) */
-const fileInput = document.getElementById('fileInput');
-const captionInput = document.getElementById('caption');
-document.getElementById('postBtn').addEventListener('click', ()=> {
-  const file = fileInput.files[0];
-  const caption = captionInput.value.trim();
-  if(!file){ alert('Please select an image'); return; }
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const posts = readPosts();
-    posts.push({ id:uid(), image:e.target.result, caption:caption, createdAt:Date.now(), likes:[], comments:[] });
-    writePosts(posts);
-    fileInput.value=''; captionInput.value=''; renderFeed(); updateProfileStats(); alert('Posted!');
+  <script>
+  /*************************************************************************
+   * 1) REPLACE the firebaseConfig below with YOUR Firebase web app config
+   *    (Firebase Console → Project settings → SDK setup & config)
+   *
+   * 2) In Firebase console:
+   *    - Enable Authentication -> Email/Password
+   *    - Create Firestore DB (start in test mode for dev)
+   *    - Use Storage bucket (default)
+   *
+   * 3) This single file demo uses compat SDK for simplicity.
+   *************************************************************************/
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
-  reader.readAsDataURL(file);
-});
 
-/* Profile view */
-function showProfile(){
-  document.getElementById('compose').style.display='none';
-  document.getElementById('feed').style.display='none';
-  profileView.style.display='block';
-  const posts = readPosts().filter(p=>true).slice().sort((a,b)=>b.createdAt-a.createdAt); // all local posts
-  profilePosts.innerHTML='';
-  posts.forEach(p=>{
-    const d = document.createElement('div'); d.className='post';
-    d.innerHTML = `<div class="imageWrap"><img src="${escapeHTML(p.image)}" /></div><div class="caption">${escapeHTML(p.caption||'')}</div>`;
-    profilePosts.appendChild(d);
+  // init
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  // UI refs
+  const btnLogin = document.getElementById('btnLogin');
+  const btnSignup = document.getElementById('btnSignup');
+  const authForm = document.getElementById('authForm');
+  const authSubmit = document.getElementById('authSubmit');
+  const authMsg = document.getElementById('authMsg');
+  const emailInput = document.getElementById('email');
+  const passInput = document.getElementById('password');
+  const userInfo = document.getElementById('userInfo');
+  const userCard = document.getElementById('userCard');
+  const userEmailSpan = document.getElementById('userEmail');
+  const userUidSpan = document.getElementById('userUid');
+  const btnSignOut = document.getElementById('btnSignOut');
+
+  const fileInput = document.getElementById('fileInput');
+  const captionInput = document.getElementById('captionInput');
+  const postBtn = document.getElementById('postBtn');
+  const uploadProgress = document.getElementById('uploadProgress');
+
+  const storiesEl = document.getElementById('stories');
+  const feedArea = document.getElementById('feedArea');
+
+  let authMode = 'login'; // or 'signup'
+  btnLogin.onclick = ()=>{ authMode = 'login'; authMsg.textContent='Login mode'; }
+  btnSignup.onclick = ()=>{ authMode = 'signup'; authMsg.textContent='Signup mode'; }
+
+  authSubmit.onclick = async ()=>{
+    const email = emailInput.value.trim();
+    const pass = passInput.value;
+    if(!email || !pass){ authMsg.textContent = 'Provide email & password'; return; }
+    authMsg.textContent = 'Please wait...';
+    try {
+      if(authMode === 'signup'){
+        await auth.createUserWithEmailAndPassword(email, pass);
+        authMsg.textContent = 'Account created';
+      } else {
+        await auth.signInWithEmailAndPassword(email, pass);
+        authMsg.textContent = 'Logged in';
+      }
+      emailInput.value = ''; passInput.value = '';
+    } catch(e){
+      authMsg.textContent = e.message || 'Error';
+    }
+  };
+
+  btnSignOut.onclick = async ()=> {
+    await auth.signOut();
+  };
+
+  // Auth state listener
+  auth.onAuthStateChanged(user=>{
+    if(user){
+      // show user info
+      authForm.style.display = 'none';
+      authMsg.style.display = 'none';
+      userInfo.style.display = 'block';
+      userEmailSpan.textContent = user.email;
+      userUidSpan.textContent = user.uid;
+    } else {
+      authForm.style.display = 'flex';
+      authMsg.style.display = 'block';
+      userInfo.style.display = 'none';
+      authMsg.textContent = 'Not logged in';
+    }
   });
-  updateProfileStats();
-}
-function showHome(){
-  document.getElementById('compose').style.display='';
-  document.getElementById('feed').style.display='';
-  profileView.style.display='none';
-  renderFeed();
-}
 
-/* Stats */
-function updateProfileStats(){
-  const posts = readPosts();
-  const myPosts = posts.filter(p=>true);
-  const likes = myPosts.reduce((s,p)=>s + (p.likes? p.likes.length:0), 0);
-  profileStats.innerHTML = `<div>Posts: <strong>${myPosts.length}</strong></div><div>Likes: <strong>${likes}</strong></div>`;
-}
+  // sample stories
+  const sampleStories = [
+    {name:'yash', img:'https://source.unsplash.com/random/200x200?face'},
+    {name:'aarav', img:'https://source.unsplash.com/random/200x200?person'},
+    {name:'ria', img:'https://source.unsplash.com/random/200x200?girl'},
+    {name:'travel', img:'https://source.unsplash.com/random/200x200?travel'},
+    {name:'food', img:'https://source.unsplash.com/random/200x200?food'}
+  ];
+  sampleStories.forEach(s=>{
+    const d = document.createElement('div'); d.className='story';
+    d.innerHTML = `<img src="${s.img}" alt="${s.name}"/><div class="small">${s.name}</div>`;
+    storiesEl.appendChild(d);
+  });
 
-/* Utilities */
-function timeAgo(ts){
-  const s = Math.floor((Date.now()-ts)/1000);
-  if(s < 60) return s+'s';
-  if(s < 3600) return Math.floor(s/60)+'m';
-  if(s < 86400) return Math.floor(s/3600)+'h';
-  return Math.floor(s/86400)+'d';
-}
-function escapeHTML(s){ if(!s) return ''; return (''+s).replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  // Realtime posts listener
+  function renderPosts(posts){
+    feedArea.innerHTML = '';
+    posts.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'card post';
+      const created = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate().toLocaleString() : '';
+      const likesCount = Array.isArray(p.likes) ? p.likes.length : 0;
+      const likedByMe = auth.currentUser && Array.isArray(p.likes) && p.likes.includes(auth.currentUser.uid);
+      const commentsHtml = (Array.isArray(p.comments) && p.comments.slice(-5).map(c => `<div style="margin-top:6px"><strong>${escapeHtml(c.userEmail||'user')}</strong> <span class="small">${escapeHtml(c.text)}</span></div>`).join('')) || '';
 
-/* Nav */
-document.getElementById('navHome').addEventListener('click', showHome);
-document.getElementById('navNew').addEventListener('click', ()=>{ window.scrollTo({top:0,behavior:'smooth'}); });
-document.getElementById('navProfile').addEventListener('click', showProfile);
-document.getElementById('goProfile').addEventListener('click', showProfile);
-document.getElementById('clearAll').addEventListener('click', ()=>{ if(confirm('Clear all local posts?')){ localStorage.removeItem(LS_KEY); location.reload(); } });
+      div.innerHTML = `
+        <div class="post-header row" style="justify-content:space-between">
+          <div class="row">
+            <img src="https://www.gravatar.com/avatar/${(p.authorEmail||'').toLowerCase()}?d=identicon" style="width:40px;height:40px;border-radius:999px" />
+            <div style="margin-left:8px">
+              <div style="font-weight:700">${escapeHtml(p.authorEmail||'Unknown')}</div>
+              <div class="small">${created}</div>
+            </div>
+          </div>
+        </div>
 
-/* initial render */
-renderFeed();
-updateProfileStats();
+        <div style="margin-top:10px"><img class="main" src="${p.imageURL}" alt="post" /></div>
 
-/* scrolling title update (optional) */
-function setTitle(t){ document.getElementById('scrollTitle').innerText = t + ' • ' + t + ' • '; }
-setTitle('Scrolling Top — MULTI APPS Social');
+        <div style="padding-top:8px">
+          <div class="row" style="justify-content:space-between;align-items:center">
+            <div class="row">
+              <div class="like" data-id="${p.id}" style="font-size:20px">${likedByMe ? '💗' : '🤍'}</div>
+              <div style="margin-left:10px;font-weight:600">${likesCount} likes</div>
+            </div>
+            <div class="small">${escapeHtml(p.caption||'')}</div>
+          </div>
 
-</script>
+          <div style="margin-top:8px">${commentsHtml}</div>
+
+          <div class="comment-input">
+            <input class="input comment-field" placeholder="Add a comment..." data-id="${p.id}" />
+            <button class="btn comment-send" data-id="${p.id}">Send</button>
+          </div>
+        </div>
+      `;
+      feedArea.appendChild(div);
+    });
+
+    // attach like handlers
+    Array.from(document.querySelectorAll('.like')).forEach(el=>{
+      el.onclick = async ()=>{
+        const postId = el.dataset.id;
+        const user = auth.currentUser;
+        if(!user){ alert('Login to like'); return; }
+        const docRef = db.collection('posts').doc(postId);
+        const docSnap = await docRef.get();
+        if(!docSnap.exists){ return; }
+        const data = docSnap.data();
+        const has = Array.isArray(data.likes) && data.likes.includes(user.uid);
+        if(has){
+          await docRef.update({ likes: firebase.firestore.FieldValue.arrayRemove(user.uid) });
+        } else {
+          await docRef.update({ likes: firebase.firestore.FieldValue.arrayUnion(user.uid) });
+        }
+      };
+    });
+
+    // attach comment handlers
+    Array.from(document.querySelectorAll('.comment-send')).forEach(btn=>{
+      btn.onclick = async ()=>{
+        const id = btn.dataset.id;
+        const input = document.querySelector('.comment-field[data-id="'+id+'"]');
+        const text = input.value.trim();
+        if(!text){ return; }
+        const user = auth.currentUser;
+        if(!user){ alert('Login to comment'); return; }
+        const docRef = db.collection('posts').doc(id);
+        await docRef.update({
+          comments: firebase.firestore.FieldValue.arrayUnion({
+            id: Date.now(),
+            userId: user.uid,
+            userEmail: user.email,
+            text,
+            createdAt: new Date().toISOString()
+          })
+        });
+        input.value = '';
+      };
+    });
+  }
+
+  // snapshot listener
+  db.collection('posts').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const arr = [];
+    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+    renderPosts(arr);
+  });
+
+  // post upload
+  postBtn.onclick = async ()=>{
+    const file = fileInput.files[0];
+    const caption = captionInput.value.trim();
+    const user = auth.currentUser;
+    if(!user){ alert('Login to post'); return; }
+    if(!file){ alert('Choose an image'); return; }
+    const filePath = `posts/${user.uid}_${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const storageRef = storage.ref().child(filePath);
+    const uploadTask = storageRef.put(file);
+    uploadProgress.textContent = 'Uploading 0%';
+    uploadTask.on('state_changed', snapshot=>{
+      const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+      uploadProgress.textContent = 'Uploading ' + pct + '%';
+    }, err=>{
+      console.error(err); uploadProgress.textContent = 'Upload error';
+    }, async ()=>{
+      const url = await uploadTask.snapshot.ref.getDownloadURL();
+      await db.collection('posts').add({
+        authorId: user.uid,
+        authorEmail: user.email,
+        imageURL: url,
+        caption: caption || '',
+        likes: [],
+        comments: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      uploadProgress.textContent = 'Posted';
+      captionInput.value = ''; fileInput.value = '';
+      setTimeout(()=>uploadProgress.textContent='',1200);
+    });
+  };
+
+  // small helper to escape text for safe HTML injection
+  function escapeHtml(str){
+    if(!str) return '';
+    return String(str).replace(/[&<>"'`]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[s]));
+  }
+
+  // initial sample data: if no posts exist, you can optionally create a sample post (commented out)
+  // (uncomment to auto-create a sample post on first run)
+  /*
+  db.collection('posts').limit(1).get().then(snap=>{
+    if(snap.empty){
+      db.collection('posts').add({
+        authorId: 'system',
+        authorEmail: 'system@demo',
+        imageURL: 'https://source.unsplash.com/random/900x600?nature',
+        caption: 'Welcome to TopScrolling — demo post',
+        likes: [],
+        comments: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  });
+  */
+
+  // done
+  </script>
 </body>
-</html>
+                                                                         </html><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TopScrolling - Firebase Single File</title>
+  <style>
+    *{box-sizing:border-box}
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f6f8;margin:0;color:#111}
+    .header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.06);position:sticky;top:0;z-index:10}
+    .logo{color:#e91e63;font-weight:700;font-size:20px}
+    .container{max-width:900px;margin:18px auto;padding:0 12px}
+    .card{background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,0.06);padding:12px;margin-bottom:16px}
+    .stories{display:flex;gap:12px;padding:12px 0;overflow-x:auto}
+    .story{min-width:64px;text-align:center}
+    .story img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #e91e63}
+    .post img.main{width:100%;height:420px;object-fit:cover;border-radius:6px}
+    .row{display:flex;gap:8px;align-items:center}
+    .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .btn.primary{background:#e91e63;color:#fff}
+    .input{padding:8px;border-radius:8px;border:1px solid #ddd;flex:1}
+    .small{font-size:13px;color:#666}
+    .like{cursor:pointer;font-weight:600}
+    .comment-input{display:flex;gap:8px;margin-top:8px}
+    .comment-input input{flex:1;padding:8px;border-radius:8px;border:1px solid #ddd}
+    .center{text-align:center;color:#777}
+    .footer{padding:20px;text-align:center;color:#999}
+    /* responsive */
+    @media (max-width:600px){ .post img.main{height:320px} .container{padding:0 8px} }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">TopScrolling</div>
+    <div class="small">Firebase demo — replace config with yours</div>
+  </header>
+
+  <div class="container">
+    <!-- Status / user area -->
+    <div id="userCard" class="card">
+      <div id="authSection">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button id="btnLogin" class="btn">Login</button>
+          <button id="btnSignup" class="btn">Signup</button>
+        </div>
+        <div id="authForm" style="display:flex;gap:8px;align-items:center;">
+          <input id="email" class="input" placeholder="Email" />
+          <input id="password" class="input" placeholder="Password" type="password" />
+          <button id="authSubmit" class="btn primary">Go</button>
+        </div>
+        <div id="authMsg" class="small" style="margin-top:8px;color:#666"></div>
+      </div>
+
+      <div id="userInfo" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div><strong id="userEmail"></strong></div>
+            <div class="small">UID: <span id="userUid"></span></div>
+          </div>
+          <div>
+            <button id="btnSignOut" class="btn">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create post -->
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:8px">Create post</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="fileInput" type="file" accept="image/*" />
+        <input id="captionInput" class="input" placeholder="Caption (optional)" />
+        <button id="postBtn" class="btn primary">Post</button>
+        <div id="uploadProgress" class="small" style="min-width:120px"></div>
+      </div>
+      <div class="small" style="margin-top:8px">Images stored in Firebase Storage. Posts saved to Firestore.</div>
+    </div>
+
+    <!-- Stories -->
+    <div class="card stories" id="stories">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Feed -->
+    <div id="feedArea"></div>
+
+    <div class="footer">Built with Firebase — demo. Secure your rules before production.</div>
+  </div>
+
+  <!-- Firebase compat CDN (single-file demo uses compat libs for easy copy-paste) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+  <script>
+  /*************************************************************************
+   * 1) REPLACE the firebaseConfig below with YOUR Firebase web app config
+   *    (Firebase Console → Project settings → SDK setup & config)
+   *
+   * 2) In Firebase console:
+   *    - Enable Authentication -> Email/Password
+   *    - Create Firestore DB (start in test mode for dev)
+   *    - Use Storage bucket (default)
+   *
+   * 3) This single file demo uses compat SDK for simplicity.
+   *************************************************************************/
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // init
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  // UI refs
+  const btnLogin = document.getElementById('btnLogin');
+  const btnSignup = document.getElementById('btnSignup');
+  const authForm = document.getElementById('authForm');
+  const authSubmit = document.getElementById('authSubmit');
+  const authMsg = document.getElementById('authMsg');
+  const emailInput = document.getElementById('email');
+  const passInput = document.getElementById('password');
+  const userInfo = document.getElementById('userInfo');
+  const userCard = document.getElementById('userCard');
+  const userEmailSpan = document.getElementById('userEmail');
+  const userUidSpan = document.getElementById('userUid');
+  const btnSignOut = document.getElementById('btnSignOut');
+
+  const fileInput = document.getElementById('fileInput');
+  const captionInput = document.getElementById('captionInput');
+  const postBtn = document.getElementById('postBtn');
+  const uploadProgress = document.getElementById('uploadProgress');
+
+  const storiesEl = document.getElementById('stories');
+  const feedArea = document.getElementById('feedArea');
+
+  let authMode = 'login'; // or 'signup'
+  btnLogin.onclick = ()=>{ authMode = 'login'; authMsg.textContent='Login mode'; }
+  btnSignup.onclick = ()=>{ authMode = 'signup'; authMsg.textContent='Signup mode'; }
+
+  authSubmit.onclick = async ()=>{
+    const email = emailInput.value.trim();
+    const pass = passInput.value;
+    if(!email || !pass){ authMsg.textContent = 'Provide email & password'; return; }
+    authMsg.textContent = 'Please wait...';
+    try {
+      if(authMode === 'signup'){
+        await auth.createUserWithEmailAndPassword(email, pass);
+        authMsg.textContent = 'Account created';
+      } else {
+        await auth.signInWithEmailAndPassword(email, pass);
+        authMsg.textContent = 'Logged in';
+      }
+      emailInput.value = ''; passInput.value = '';
+    } catch(e){
+      authMsg.textContent = e.message || 'Error';
+    }
+  };
+
+  btnSignOut.onclick = async ()=> {
+    await auth.signOut();
+  };
+
+  // Auth state listener
+  auth.onAuthStateChanged(user=>{
+    if(user){
+      // show user info
+      authForm.style.display = 'none';
+      authMsg.style.display = 'none';
+      userInfo.style.display = 'block';
+      userEmailSpan.textContent = user.email;
+      userUidSpan.textContent = user.uid;
+    } else {
+      authForm.style.display = 'flex';
+      authMsg.style.display = 'block';
+      userInfo.style.display = 'none';
+      authMsg.textContent = 'Not logged in';
+    }
+  });
+
+  // sample stories
+  const sampleStories = [
+    {name:'yash', img:'https://source.unsplash.com/random/200x200?face'},
+    {name:'aarav', img:'https://source.unsplash.com/random/200x200?person'},
+    {name:'ria', img:'https://source.unsplash.com/random/200x200?girl'},
+    {name:'travel', img:'https://source.unsplash.com/random/200x200?travel'},
+    {name:'food', img:'https://source.unsplash.com/random/200x200?food'}
+  ];
+  sampleStories.forEach(s=>{
+    const d = document.createElement('div'); d.className='story';
+    d.innerHTML = `<img src="${s.img}" alt="${s.name}"/><div class="small">${s.name}</div>`;
+    storiesEl.appendChild(d);
+  });
+
+  // Realtime posts listener
+  function renderPosts(posts){
+    feedArea.innerHTML = '';
+    posts.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'card post';
+      const created = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate().toLocaleString() : '';
+      const likesCount = Array.isArray(p.likes) ? p.likes.length : 0;
+      const likedByMe = auth.currentUser && Array.isArray(p.likes) && p.likes.includes(auth.currentUser.uid);
+      const commentsHtml = (Array.isArray(p.comments) && p.comments.slice(-5).map(c => `<div style="margin-top:6px"><strong>${escapeHtml(c.userEmail||'user')}</strong> <span class="small">${escapeHtml(c.text)}</span></div>`).join('')) || '';
+
+      div.innerHTML = `
+        <div class="post-header row" style="justify-content:space-between">
+          <div class="row">
+            <img src="https://www.gravatar.com/avatar/${(p.authorEmail||'').toLowerCase()}?d=identicon" style="width:40px;height:40px;border-radius:999px" />
+            <div style="margin-left:8px">
+              <div style="font-weight:700">${escapeHtml(p.authorEmail||'Unknown')}</div>
+              <div class="small">${created}</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px"><img class="main" src="${p.imageURL}" alt="post" /></div>
+
+        <div style="padding-top:8px">
+          <div class="row" style="justify-content:space-between;align-items:center">
+            <div class="row">
+              <div class="like" data-id="${p.id}" style="font-size:20px">${likedByMe ? '💗' : '🤍'}</div>
+              <div style="margin-left:10px;font-weight:600">${likesCount} likes</div>
+            </div>
+            <div class="small">${escapeHtml(p.caption||'')}</div>
+          </div>
+
+          <div style="margin-top:8px">${commentsHtml}</div>
+
+          <div class="comment-input">
+            <input class="input comment-field" placeholder="Add a comment..." data-id="${p.id}" />
+            <button class="btn comment-send" data-id="${p.id}">Send</button>
+          </div>
+        </div>
+      `;
+      feedArea.appendChild(div);
+    });
+
+    // attach like handlers
+    Array.from(document.querySelectorAll('.like')).forEach(el=>{
+      el.onclick = async ()=>{
+        const postId = el.dataset.id;
+        const user = auth.currentUser;
+        if(!user){ alert('Login to like'); return; }
+        const docRef = db.collection('posts').doc(postId);
+        const docSnap = await docRef.get();
+        if(!docSnap.exists){ return; }
+        const data = docSnap.data();
+        const has = Array.isArray(data.likes) && data.likes.includes(user.uid);
+        if(has){
+          await docRef.update({ likes: firebase.firestore.FieldValue.arrayRemove(user.uid) });
+        } else {
+          await docRef.update({ likes: firebase.firestore.FieldValue.arrayUnion(user.uid) });
+        }
+      };
+    });
+
+    // attach comment handlers
+    Array.from(document.querySelectorAll('.comment-send')).forEach(btn=>{
+      btn.onclick = async ()=>{
+        const id = btn.dataset.id;
+        const input = document.querySelector('.comment-field[data-id="'+id+'"]');
+        const text = input.value.trim();
+        if(!text){ return; }
+        const user = auth.currentUser;
+        if(!user){ alert('Login to comment'); return; }
+        const docRef = db.collection('posts').doc(id);
+        await docRef.update({
+          comments: firebase.firestore.FieldValue.arrayUnion({
+            id: Date.now(),
+            userId: user.uid,
+            userEmail: user.email,
+            text,
+            createdAt: new Date().toISOString()
+          })
+        });
+        input.value = '';
+      };
+    });
+  }
+
+  // snapshot listener
+  db.collection('posts').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const arr = [];
+    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+    renderPosts(arr);
+  });
+
+  // post upload
+  postBtn.onclick = async ()=>{
+    const file = fileInput.files[0];
+    const caption = captionInput.value.trim();
+    const user = auth.currentUser;
+    if(!user){ alert('Login to post'); return; }
+    if(!file){ alert('Choose an image'); return; }
+    const filePath = `posts/${user.uid}_${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+    const storageRef = storage.ref().child(filePath);
+    const uploadTask = storageRef.put(file);
+    uploadProgress.textContent = 'Uploading 0%';
+    uploadTask.on('state_changed', snapshot=>{
+      const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+      uploadProgress.textContent = 'Uploading ' + pct + '%';
+    }, err=>{
+      console.error(err); uploadProgress.textContent = 'Upload error';
+    }, async ()=>{
+      const url = await uploadTask.snapshot.ref.getDownloadURL();
+      await db.collection('posts').add({
+        authorId: user.uid,
+        authorEmail: user.email,
+        imageURL: url,
+        caption: caption || '',
+        likes: [],
+        comments: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      uploadProgress.textContent = 'Posted';
+      captionInput.value = ''; fileInput.value = '';
+      setTimeout(()=>uploadProgress.textContent='',1200);
+    });
+  };
+
+  // small helper to escape text for safe HTML injection
+  function escapeHtml(str){
+    if(!str) return '';
+    return String(str).replace(/[&<>"'`]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[s]));
+  }
+
+  // initial sample data: if no posts exist, you can optionally create a sample post (commented out)
+  // (uncomment to auto-create a sample post on first run)
+  /*
+  db.collection('posts').limit(1).get().then(snap=>{
+    if(snap.empty){
+      db.collection('posts').add({
+        authorId: 'system',
+        authorEmail: 'system@demo',
+        imageURL: 'https://source.unsplash.com/random/900x600?nature',
+        caption: 'Welcome to TopScrolling — demo post',
+        likes: [],
+        comments: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  });
+  */
+
+  // done
+  </script>
+</body>
+  </html>
